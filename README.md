@@ -3,3 +3,6 @@ The Todo App is an advanced web-based application that allows users to manage th
 
 
 node.js
+
+author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int

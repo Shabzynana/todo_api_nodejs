@@ -1,6 +1,10 @@
 // routes/users.js
-const express = require('express');
-const todo = express.Router();
+const router = require('express').Router();
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 
-module.exports = todo;
+
+
+module.exports = router;

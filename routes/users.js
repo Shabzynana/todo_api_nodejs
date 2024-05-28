@@ -1,9 +1,15 @@
 // routes/users.js
-const express = require('express');
-const user = express.Router();
+const router = require('express').Router();
+import { PrismaClient } from '@prisma/client'
 
-user.get('/all', (req, res) => {
+const prisma = new PrismaClient()
+
+router.get('/all', (req, res) => {
     res.json("helldavadvadvo");
 });
 
-module.exports = user;
+router.get('/all', (req, res) => {
+    res.json("helldavadvadvo");
+});
+
+module.exports = router;
