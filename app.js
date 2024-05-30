@@ -20,7 +20,10 @@ const todoRouter = require('./routes/todos');
 app.use('/api', userRouter);
 app.use('/api', todoRouter);
 
-
+// app.use((err, req, res, next) => {
+//     console.error(err.stack);
+//     res.status(500).json({ error: 'Something went wrong!' });
+//   });
 
 app.get('/', (req, res) => {
     res.json("Server is online");

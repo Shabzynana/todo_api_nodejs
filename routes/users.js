@@ -1,6 +1,8 @@
 // routes/users.js
 const router = require('express').Router();
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
+
 
 const prisma = new PrismaClient()
 
@@ -17,35 +19,47 @@ router.get('/users', async (req, res) => {
 });
  
 
-router.post('/register', async(req, res) => {
+router.post('/register', async(req, res, next) => {
+    const { email, firstname, lastname, username, password, gender } = req.body;
+
     try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
         const user =  await prisma.user.create({
-            data : req.body
+            data : {
+                email,
+                firstname,
+                lastname,
+                username,
+                gender,
+                password:hashedPassword
+            }
         })
         res.json(user);
     } catch (error) {
-        res.json({ 'error': error });
+        next(error)
     }
 });
 
 
 router.get('/user/:id', async (req, res, next) => {
-    try {
-        const {id} = req.params
-        const user = await prisma.user.findUnique({
-            where: { id: parseInt(id) },
-        });
-        if (user) {
-            res.json(user);
-        }
-        else {
-            res.json({ error: 'Post not found.'});
-        }
-    } catch (error) {
-        next(error)
-        // res.json({'error': error})
+try {
+    const {id} = req.params
+    const user = await prisma.user.findUnique({
+        where: { id: parseInt(id) },
+    });
+    if (user) {
+        res.json(user);
     }
-  });
+    else {
+        res.json({ error: 'Post not found.'});
+    }
+} catch (error) {
+    next(error) 
+    }
+});
+
+  
 
 
 
