@@ -23,14 +23,14 @@ model User {
   password     String   @db.VarChar(64)
   registeredAt DateTime @default(now())
   confirmed    Boolean  @default(false)
-  confirmedAt  DateTime
+  confirmedAt  DateTime?
   todo         Todo[]
 }
 
 model Todo {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime?
   title     String   @db.VarChar(128)
   content   String
   date      DateTime 
