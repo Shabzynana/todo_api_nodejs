@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 
 
 router.get('/test', (req, res) => {
-    res.json("helldavbsbfbfsddgddggdvo");
+    res.json("User route is up");
 });
 
 
@@ -43,20 +43,20 @@ router.post('/register', async(req, res, next) => {
 
 
 router.get('/user/:id', async (req, res, next) => {
-try {
-    const {id} = req.params
-    const user = await prisma.user.findUnique({
-        where: { id: parseInt(id) },
-    });
-    if (user) {
-        res.json(user);
-    }
-    else {
-        res.json({ error: 'Post not found.'});
-    }
-} catch (error) {
-    next(error) 
-    }
+    try {
+        const {id} = req.params
+        const user = await prisma.user.findUnique({
+            where: { id: parseInt(id) },
+        });
+        if (user) {
+            res.json(user);
+        }
+        else {
+            res.json({ error: 'Post not found.'});
+        }
+    } catch (error) {
+        next(error) 
+        }
 });
 
   
