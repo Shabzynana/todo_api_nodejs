@@ -32,6 +32,26 @@ router.post("/create", async (req,res) => {
 });
 
 
+router.get("/task/:id", async (req, res, next) => {
+
+    try {
+        const {id} = req.params
+        const task = await prisma.todo.findUnique({
+            where: { id: Number(id) },
+        });
+        if (task) {
+            res.json(task);
+        }
+        else {
+            res.json({ error: 'Post not found.'});
+        }
+    } catch (error) {
+        next(error) 
+        }
+
+});
+
+
 router.get("/tasks", async (req, res, next) => {
     try {
         const task = await prisma.todo.findMany();
