@@ -57,7 +57,7 @@ router.get("/task/:id", async (req, res, next) => {
             res.json(task);
         }
         else {
-            res.json({ error: 'Post not found.'});
+            res.json({ error: 'Task not found.'});
         }
     } catch (error) {
         next(error) 
@@ -86,29 +86,29 @@ router.get("/user_task/:id", async (req ,res, next) => {
 });
 
 
-// // UPDATE A TASK USING ID
-// router.put("/task/:id", async(req, res, next) => {
+// UPDATE A TASK USING ID
+router.put("/task/:id", async(req, res, next) => {
 
-//     // const { name, email, password } = req.body;
-//     try {
-//         const {id} = req.params
-//         const taskId = await prisma.todo.findUnique({
-//             where: { id: Number(id) },
-//         });
-//         if (!taskId) {
-//             res.json({'error': 'Task Not Found!'})
-//         } else {
-//             const task = await prisma.todo.update({
-//                 where : {id : Number(id)},
-//                 data: req.body,
-//             });
-//             res.json(task)
-//         }
-//     } catch (error) {
-//         next(error)
-//     }    
+    // const { name, email, password } = req.body;
+    try {
+        const {id} = req.params
+        const taskId = await prisma.todo.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!taskId) {
+            res.json({'error': 'Task Not Found!'})
+        } else {
+            const task = await prisma.todo.update({
+                where : {id : Number(id)},
+                data: req.body,
+            });
+            res.json(task)
+        }
+    } catch (error) {
+        next(error)
+    }    
 
-// });
+});
 
 
 // DELETE TASK USING ID
