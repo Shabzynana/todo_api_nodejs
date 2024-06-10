@@ -112,28 +112,26 @@ router.put("/task/:id", async(req, res, next) => {
 
 
 // DELETE TASK USING ID
-// router.put("/task/:id", async(req, res, next) => {
+router.delete("/task/:id", async(req, res, next) => {
 
-//     // const { name, email, password } = req.body;
-//     try {
-//         const {id} = req.params
-//         const taskId = await prisma.todo.findUnique({
-//             where: { id: Number(id) },
-//         });
-//         if (!taskId) {
-//             res.json({'error': 'Task Not Found!'})
-//         } else {
-//             const task = await prisma.todo.delete({
-//                 where : {id : Number(id)},
-//                 data: req.body,
-//             });
-//             res.json(task)
-//         }
-//     } catch (error) {
-//         next(error)
-//     }    
-
-// });
+    // const { name, email, password } = req.body;
+    try {
+        const {id} = req.params
+        const taskId = await prisma.todo.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!taskId) {
+            res.json({'error': 'Task Not Found!'})
+        } else {
+            const task = await prisma.todo.delete({
+                where : {id : Number(id)},
+            });
+            res.json({'msg': 'Task Deleted', task})
+        }
+    } catch (error) {
+        next(error)
+    }    
+});
 
 
 
