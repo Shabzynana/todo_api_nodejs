@@ -1,10 +1,8 @@
 // routes/users.js
 const router = require('express').Router();
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
 
-
-const prisma = new PrismaClient()
+const { prisma } = require('../prisma/client');
+const { authMiddleware, hashPassword, comparePassword} = require('../utils/helpers');
 
 
 router.get('/test', (req, res) => {
@@ -23,8 +21,6 @@ router.post('/register', async(req, res, next) => {
     const { email, firstname, lastname, username, password, gender } = req.body;
 
     try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
         const user =  await prisma.user.create({
             data : {
                 email,
@@ -32,7 +28,7 @@ router.post('/register', async(req, res, next) => {
                 lastname,
                 username,
                 gender,
-                password:hashedPassword
+                password: hashPassword(password) 
             }
         })
         res.json(user);
@@ -40,6 +36,72 @@ router.post('/register', async(req, res, next) => {
         next(error)
     }
 });
+
+
+// Login route
+router.post('/login', async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email }
+      });
+      if (!user) {
+        res.json({"error": "Email is Invalid!"})
+      }
+      if (user && comparePassword(password, user.password)) {
+        req.session.user = { id: user.id, 
+                             username: user.username };
+        res.send({"msg" : "Login successful"});
+      } else if (user || (!comparePassword(password, user.password))) {
+        res.json({"error": "Password is Incorrect!"})
+      } else  {
+        res.status(401).send('Invalid username or password');
+      }
+    } catch (error) {
+        next(error)
+    //   res.status(500).send('Error logging in');
+    }
+  }); 
+
+
+// Logout route
+router.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+        return res.status(500).send({"error": "Failed to logout"});
+        }
+        res.clearCookie('connect.sid');
+        res.json('Logout successful');
+    });
+});  
+
+
+
+
+// Route to get current logged-in user
+router.get('/current_user', authMiddleware, async (req, res) => {
+    const userId = req.session.user.id;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, username: true } // Adjust the selected fields as needed
+      });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).send('User not found');
+      }
+    } catch (error) {
+      res.status(500).send('Error fetching user data');
+    }
+  });
+
+
+
+
+
+
+
 
 
 router.get('/user/:id', async (req, res, next) => {

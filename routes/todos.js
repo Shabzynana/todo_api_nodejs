@@ -1,9 +1,10 @@
 // routes/users.js
 const router = require('express').Router();
-const { PrismaClient } = require('@prisma/client');
+
+const { authMiddleware} = require('../utils/helpers');
+const { prisma } = require('../prisma/client');
 
 
-const prisma = new PrismaClient()
 
 
 // TEST ROUTE
@@ -11,6 +12,7 @@ router.get("/taskhome", async (req, res) => {
     res.json("Todo route is up");
 
 });
+
 
 
 // GET ALL TASK IN THE DATABASE
@@ -26,23 +28,24 @@ router.get("/tasks", async (req, res, next) => {
 
 
 // CREATE TASK
-router.post("/create", async (req,res) => {
+router.post("/create",  authMiddleware, async (req,res,next) => {
 
-    // const { title, content, date, userId} = req.body;
-    const newPost = await prisma.todo.create({
-        data: req.body,
-      });
-    res.json(newPost)  
-
-    // const user =  await prisma.todo.create({
-    //     data : {
-    //         title,
-    //         content,
-    //         date,
-    //         userId:hashedPassword
-    //     }
-    // })
-
+    const { title, content, date, userId} = req.body;
+    try{
+        const newPost = await prisma.todo.create({
+            // data: req.body,
+            data : {
+                title,
+                content,
+                date,
+                userId : req.session.user.id,
+            }
+          });
+        res.json(newPost)  
+    } catch (error) {
+        next(error)
+    }
+    
 });
 
 
