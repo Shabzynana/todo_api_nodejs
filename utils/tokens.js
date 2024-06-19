@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'your_secret_key';
-const RESET_TOKEN_SECRET = 'your_reset_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET;
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
 
 // Function to sign a token
 function signToken(payload, secret, expiresIn) {
