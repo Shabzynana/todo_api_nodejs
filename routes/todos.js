@@ -50,7 +50,7 @@ router.post("/create", authMiddleware, async (req,res,next) => {
 
 
 // GET A TASK BY ID
-router.get("/task/:id", async (req, res, next) => {
+router.get("/task/:id", authMiddleware, async (req, res, next) => {
     try {
         const {id} = req.params
         const task = await prisma.todo.findUnique({
@@ -97,14 +97,16 @@ router.put("/task/:id", authMiddleware, async(req, res, next) => {
         const {id} = req.params
         const taskId = await prisma.todo.findUnique({
             where: { id: Number(id) },
+   
         });
+
         if (!taskId) {
             res.json({'error': 'Task Not Found!'})
-        }
-        if (taskId.userId !== req.session.user.id) {
+        } 
+        
+        else if (taskId.userId !== req.session.user.id) {
             return res.status(403).json({ error: 'You are not the author of this post' });
-            }    
-        else {
+        } else {
             const task = await prisma.todo.update({
                 where : {id : Number(id)},
                 data: req.body,
@@ -119,7 +121,7 @@ router.put("/task/:id", authMiddleware, async(req, res, next) => {
 
 
 // DELETE TASK USING ID
-router.delete("/task/:id", async(req, res, next) => {
+router.delete("/task/:id", authMiddleware, async(req, res, next) => {
 
     // const { name, email, password } = req.body;
     try {
@@ -129,7 +131,10 @@ router.delete("/task/:id", async(req, res, next) => {
         });
         if (!taskId) {
             res.json({'error': 'Task Not Found!'})
-        } else {
+        } else if (taskId.userId !== req.session.user.id) {
+            return res.status(403).json({ error: 'You are not the author of this post' });
+            }  
+        else {
             const task = await prisma.todo.delete({
                 where : {id : Number(id)},
             });

@@ -104,12 +104,6 @@ router.get('/current_user', authMiddleware, async (req, res) => {
 
 
 
-
-
-
-
-
-
 router.get('/user/:id', async (req, res, next) => {
     try {
         const {id} = req.params
