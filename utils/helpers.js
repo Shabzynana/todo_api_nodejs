@@ -1,14 +1,40 @@
 const bcrypt = require('bcrypt');
+const { prisma } = require('../prisma/client');
+
 
 // login required
 function authMiddleware(req, res, next) {
     if (req.session.user) {
       next();
-      console.log('mee');
+      // console.log('mee');
     } else {
       res.status(401).send('You need to log in first');
     }
 }  
+
+
+async function currentuser (req, res, next) {
+
+  const userId = req.session.user.id;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true} // Adjust the selected fields as needed
+      });
+      if (user) {
+        return res.json(user);
+      } else {
+        res.status(404).send('User not found');
+      }
+    } catch (error) {
+      next(error)
+      // res.status(500).send('Error fetching user data');
+    }
+
+} 
+
+
+
 
 // Number of salt rounds for hashing
 // Function to hash a password
@@ -43,5 +69,5 @@ function comparePassword(raw, hash) {
 }  
   
 module.exports = {
-    authMiddleware, hashPassword, comparePassword
+    authMiddleware, hashPassword, comparePassword, currentuser
 };

@@ -2,13 +2,19 @@
 const router = require('express').Router();
 
 const { prisma } = require('../prisma/client');
-const { authMiddleware, hashPassword, comparePassword} = require('../utils/helpers');
+const { authMiddleware, hashPassword, comparePassword, currentuser} = require('../utils/helpers');
 
 
-router.get('/test', (req, res) => {
-    res.json("User route is up");
+router.get('/asd', authMiddleware, currentuser, (req, res) => {
+    console.log(currentuser)
+    res.json(currentuser);
 });
 
+
+
+router.get('/asd', (req, res) => {
+  res.json("User route is up");
+});
 
 router.get('/users', async (req, res) => {
 

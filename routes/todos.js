@@ -1,7 +1,7 @@
 // routes/users.js
 const router = require('express').Router();
 
-const { authMiddleware} = require('../utils/helpers');
+const { authMiddleware, currentuser } = require('../utils/helpers');
 const { prisma } = require('../prisma/client');
 
 
@@ -28,7 +28,7 @@ router.get("/tasks", async (req, res, next) => {
 
 
 // CREATE TASK
-router.post("/create",  authMiddleware, async (req,res,next) => {
+router.post("/create", authMiddleware, async (req,res,next) => {
 
     const { title, content, date, userId} = req.body;
     try{
@@ -90,7 +90,7 @@ router.get("/user_task/:id", async (req ,res, next) => {
 
 
 // UPDATE A TASK USING ID
-router.put("/task/:id", async(req, res, next) => {
+router.put("/task/:id", authMiddleware, async(req, res, next) => {
 
     // const { name, email, password } = req.body;
     try {
@@ -100,7 +100,11 @@ router.put("/task/:id", async(req, res, next) => {
         });
         if (!taskId) {
             res.json({'error': 'Task Not Found!'})
-        } else {
+        }
+        if (taskId.userId !== req.session.user.id) {
+            return res.status(403).json({ error: 'You are not the author of this post' });
+            }    
+        else {
             const task = await prisma.todo.update({
                 where : {id : Number(id)},
                 data: req.body,
