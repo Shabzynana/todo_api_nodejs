@@ -50,7 +50,7 @@ router.post("/create", authMiddleware, async (req,res,next) => {
 
 
 // GET A TASK BY ID
-router.get("/task/:id", authMiddleware, async (req, res, next) => {
+router.get("/task/:id", authMiddleware,async (req, res, next) => {
     try {
         const {id} = req.params
         const task = await prisma.todo.findUnique({
@@ -72,16 +72,38 @@ router.get("/task/:id", authMiddleware, async (req, res, next) => {
 router.get("/user_task/:id", async (req ,res, next) => {
     try {
         const {id} = req.params
-        const userId = await prisma.user.findUnique({
+        const user_Id = await prisma.user.findUnique({
             where: { id: Number(id) },
         });
-        if (!userId) {
-            res.json({'error': 'User Does Not Exist!'})
+        console.log(user_Id)
+        if (!user_Id) {
+            res.json({'error': 'User Does Notddddd Exist!'})
         }
         const task = await prisma.todo.findMany({
             where: { userId: Number(id) }
+            // where: { User: user_Id }
         });
-        console.log(task);
+        res.json(task);  
+    } catch (error) {
+        next(error)
+        }
+});
+
+
+
+// GET ALL TASK BY A PARTICULAR USER
+router.get("/user_tasks/:user", async (req ,res, next) => {
+    try {
+        const {user} = req.params
+        const user_Id = await prisma.user.findUnique({
+            where: { username: user },
+        });
+        if (!user_Id) {
+            res.json({'error': 'User Does Not Exist!'})
+        }
+        const task = await prisma.todo.findMany({
+            where: { User: user_Id }
+        });
         res.json(task);  
     } catch (error) {
         next(error)
