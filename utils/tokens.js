@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
+const EMAIL_TOKEN_SECRET = process.env.EMAIL_TOKEN_SECRET;
 
 // Function to sign a token
 function signToken(payload, secret, expiresIn) {
@@ -21,5 +22,6 @@ module.exports = {
   signToken,
   validateToken,
   RESET_TOKEN_SECRET,
-  JWT_SECRET
+  JWT_SECRET,
+  EMAIL_TOKEN_SECRET
 };

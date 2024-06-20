@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 const { prisma } = require('../prisma/client');
 const { authMiddleware, hashPassword, comparePassword, currentuser} = require('../utils/helpers');
-const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET } = require('../utils/tokens');
+const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../utils/tokens');
 const { sendMail } = require('../utils/mails');
 
 
@@ -140,7 +140,7 @@ router.post('/request-reset', async (req, res, next) => {
     return res.status(404).json({ message: 'Email not found' });
   }
 
-  const resetToken = signToken({ id: user.id, email: user.email }, RESET_TOKEN_SECRET, '30m');
+  const resetToken = signToken({ id: user.id, email: user.email }, RESET_TOKEN_SECRET, '10m');
   // const resetUrl = `http://localhost:3000/api/reset-password?token=${resetToken}`;
   const resetUrl = `http://localhost:3000/api/reset-password/${resetToken}`;
 
@@ -157,9 +157,6 @@ router.post('/request-reset', async (req, res, next) => {
 
 
 
-// Reset password
-// app.post('/reset-password', async (req, res, next) => {
-//   const { token, newPassword } = req.body;
 
 router.post('/reset-password/:token', async (req, res, next) => {
   const { token } = req.params;
@@ -173,26 +170,19 @@ router.post('/reset-password/:token', async (req, res, next) => {
       where: { id: decoded.id },
     });
     console.log(user)
-    console.log(decoded.id)
-    console.log(password, "sad")
+  
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-
     // const updatePassword = await prisma.user.update({
-    await prisma.user.update({
- 
+    await prisma.user.update({ 
       where: { id: user.id },
       data: {
         password: hashPassword(password),
       },
     })
-    // user.password = hashPassword(newPassword);
+        // user.password = hashPassword(newPassword);
     res.json({ message: 'Password reset successful' });
-    console.log(password)
-
-
 
   } catch (error) {
     next(error)
@@ -201,7 +191,29 @@ router.post('/reset-password/:token', async (req, res, next) => {
 });
   
 
+// Resend Confirmation Mail
+router.post('/email-resend', authMiddleware, async (req, res, next) => {
 
+  const userId = req.session.user.id;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  console.log(user.email, 'before email')
+
+  const resendToken = signToken({ id: user.id, email: user.email }, EMAIL_TOKEN_SECRET, '10m');
+  // const resendUrl = `http://localhost:3000/api/confirm-email?token=${resetToken}`;
+  const resendUrl = `http://localhost:3000/api/confirm-email/${resendToken}`;
+
+
+  try {
+    await sendMail(user.email, 'Email Confirmation', `Please click the following link to confirm your emil: ${resendUrl}`);
+    res.json({ message: 'Please chceck your email, An email as been sent to confirm your account'})
+    console.log(user.email, 'after email')
+  } catch (error) {
+    next(error)
+    // res.status(500).json({ message: 'Error sending email', error });
+  }
+});
 
 
 
