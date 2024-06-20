@@ -155,9 +155,7 @@ router.post('/request-reset', async (req, res, next) => {
 });
 
 
-
-
-
+// route to reset password??
 router.post('/reset-password/:token', async (req, res, next) => {
   const { token } = req.params;
   const { password } = req.body;  
@@ -206,7 +204,7 @@ router.post('/email-resend', authMiddleware, async (req, res, next) => {
 
 
   try {
-    await sendMail(user.email, 'Email Confirmation', `Please click the following link to confirm your emil: ${resendUrl}`);
+    await sendMail(user.email, 'Email Confirmation', `Please click the following link to confirm your email: ${resendUrl}`);
     res.json({ message: 'Please chceck your email, An email as been sent to confirm your account'})
     console.log(user.email, 'after email')
   } catch (error) {
@@ -215,6 +213,34 @@ router.post('/email-resend', authMiddleware, async (req, res, next) => {
   }
 });
 
+
+// route to confirm email/account
+router.post('/confirm-email/:token', async (req, res, next) => {
+  const { token } = req.params;
+
+  try {
+    const decoded = validateToken(token, EMAIL_TOKEN_SECRET);
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
+    console.log(user) 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const updateUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        confirmed: true,
+        confirmedAt: new Date(),
+      },
+    })
+    res.json({ message: 'Your Email as been confirmed', updateUser });
+
+  } catch (error) {
+    next(error)
+    }
+});
 
 
 
