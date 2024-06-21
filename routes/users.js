@@ -4,7 +4,7 @@ const router = require('express').Router();
 const { prisma } = require('../prisma/client');
 const { authMiddleware, hashPassword, comparePassword, currentuser} = require('../utils/helpers');
 const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../utils/tokens');
-const { sendMail } = require('../utils/mails');
+const { sendPasswordResetMail, sendConfirmMail } = require('../utils/mails');
 
 
 router.get('/asd', authMiddleware, currentuser, (req, res) => {
@@ -146,7 +146,7 @@ router.post('/request-reset', async (req, res, next) => {
 
 
   try {
-    await sendMail(user.email, 'Password Reset', `Click the following link to reset your password: ${resetUrl}`);
+    await sendPasswordResetMail(user.email, 'Password Reset', `Click the following link to reset your password: ${resetUrl}`);
     res.json({ message: 'Password reset email sent' });
   } catch (error) {
     next(error)
@@ -199,19 +199,17 @@ router.post('/email-resend', authMiddleware, async (req, res, next) => {
   console.log(user.email, 'before email')
 
   const resendToken = signToken({ id: user.id, email: user.email }, EMAIL_TOKEN_SECRET, '10m');
-  // const resendUrl = `http://localhost:3000/api/confirm-email?token=${resetToken}`;
   const resendUrl = `http://localhost:3000/api/confirm-email/${resendToken}`;
 
-
-  try {
-    await sendMail(user.email, 'Email Confirmation', `Please click the following link to confirm your email: ${resendUrl}`);
+  try {   
+    await sendConfirmMail(user.email, 'Email Confirmation', resendUrl, user.username);
     res.json({ message: 'Please chceck your email, An email as been sent to confirm your account'})
     console.log(user.email, 'after email')
   } catch (error) {
     next(error)
-    // res.status(500).json({ message: 'Error sending email', error });
   }
 });
+
 
 
 // route to confirm email/account
