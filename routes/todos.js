@@ -1,7 +1,7 @@
 // routes/users.js
 const router = require('express').Router();
 
-const { authMiddleware, currentuser } = require('../utils/helpers');
+const { authMiddleware, ConfirmedUserMiddleware, currentuser } = require('../utils/helpers');
 const { prisma } = require('../prisma/client');
 
 
@@ -28,7 +28,7 @@ router.get("/tasks", async (req, res, next) => {
 
 
 // CREATE TASK
-router.post("/create", authMiddleware, async (req,res,next) => {
+router.post("/create", authMiddleware, ConfirmedUserMiddleware, async (req,res,next) => {
 
     const { title, content, date, userId} = req.body;
     try{
@@ -50,7 +50,7 @@ router.post("/create", authMiddleware, async (req,res,next) => {
 
 
 // GET A TASK BY ID
-router.get("/task/:id", authMiddleware,async (req, res, next) => {
+router.get("/task/:id", authMiddleware, async (req, res, next) => {
     try {
         const {id} = req.params
         const task = await prisma.todo.findUnique({

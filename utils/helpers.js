@@ -14,6 +14,26 @@ function authMiddleware(req, res, next) {
 
 
 
+// aaa
+async function ConfirmedUserMiddleware (req, res, next) {
+
+  userId = req.session.user.id
+  console.log(userId)
+
+  user = await prisma.user.findUnique({
+    where: { id: userId },
+  })
+  console.log(user)
+  console.log(user.confirmed)
+  if (user.confirmed === false) {
+    res.status(401).send('You need to confirm your email first');
+  } else {
+    next();
+  }
+}  
+
+
+
 async function currentuser (req, res, next) {
 
   const userId = req.session.user.id;
@@ -70,5 +90,5 @@ function comparePassword(raw, hash) {
 }  
   
 module.exports = {
-    authMiddleware, hashPassword, comparePassword, currentuser
+    authMiddleware, hashPassword, comparePassword, currentuser, ConfirmedUserMiddleware
 };

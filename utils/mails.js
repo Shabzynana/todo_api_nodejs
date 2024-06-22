@@ -44,13 +44,13 @@ function sendPasswordResetMail(to, subject, text) {
 
 
 // / Function to send mail to confirm email
-function sendConfirmMail(to, subject, resendUrl, username) {
+function sendConfirmMail(to, subject, sendUrl, username) {
   // Read the HTML template
   const templatePath = path.join(__dirname, '../templates/confirm_email.html');
   let htmlContent = fs.readFileSync(templatePath, 'utf8');
 
   // Replace the placeholder with the actual reset URL
-  htmlContent = htmlContent.replace('{{resendUrl}}', resendUrl);
+  htmlContent = htmlContent.replace('{{resendUrl}}', sendUrl);
   htmlContent = htmlContent.replace('{{username}}', username);
 
   const mailOptions = {
