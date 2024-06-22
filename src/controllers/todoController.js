@@ -2,14 +2,11 @@
 const { prisma } = require('../../prisma/client');
 
 
-
-
 // TEST ROUTE
 async function taskhome(req, res) {
     res.json("Todo route is up");
 
 };
-
 
 
 // GET ALL TASK IN THE DATABASE
@@ -20,7 +17,6 @@ async function allTasks(req, res, next) {
     } catch (error) {
         next(error)
     }
-    
 };
 
 
