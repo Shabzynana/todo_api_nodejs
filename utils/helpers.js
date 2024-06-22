@@ -13,6 +13,7 @@ function authMiddleware(req, res, next) {
 }  
 
 
+
 async function currentuser (req, res, next) {
 
   const userId = req.session.user.id;
