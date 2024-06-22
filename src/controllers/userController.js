@@ -3,13 +3,12 @@
 const { prisma } = require('../../prisma/client');
 
 
-
 function userhome (req, res) {
     res.json("User route is up");
 }; 
 
 
-// async function currentuse (req, res) {
+// async function currentuser (req, res) {
 //     console.log(currentuser)
 //     res.json(currentuser);
 // };

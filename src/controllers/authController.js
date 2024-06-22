@@ -2,7 +2,7 @@
 
 const { prisma } = require('../../prisma/client');
 // const { authMiddleware } = require('../middlewares/authMiddleware');
-const { hashPassword, comparePassword, currentuser} = require('../services/authService');
+const { hashPassword, comparePassword } = require('../services/authService');
 const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../services/tokenService');
 const { sendPasswordResetMail, sendConfirmMail } = require('../services/emailService');
 
