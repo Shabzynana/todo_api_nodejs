@@ -41,10 +41,10 @@ router.post('/register', async(req, res, next) => {
         })
 
         const sendToken = signToken({ id: user.id, email: user.email }, EMAIL_TOKEN_SECRET, '10m');
-        const sendUrl = `http://localhost:3000/api/confirm-email/${sendToken}`;
+        const resendUrl = `http://localhost:3000/api/confirm-email/${sendToken}`;
 
         try {   
-          await sendConfirmMail(user.email, 'Email Confirmation', sendUrl, user.username);
+          await sendConfirmMail(user.email, 'Email Confirmation', resendUrl, user.username);
           res.json({ message: 'Please chceck your email, An email as been sent to confirm your account', user})
           console.log(user.email, 'after email')
         } catch (error) {
