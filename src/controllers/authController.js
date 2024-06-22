@@ -1,31 +1,21 @@
 // routes/users.js
-const router = require('express').Router();
 
-const { prisma } = require('../prisma/client');
-const { authMiddleware, hashPassword, comparePassword, currentuser} = require('../utils/helpers');
-const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../utils/tokens');
-const { sendPasswordResetMail, sendConfirmMail } = require('../utils/mails');
-
-
-router.get('/asd', authMiddleware, currentuser, (req, res) => {
-    console.log(currentuser)
-    res.json(currentuser);
-});
+const { prisma } = require('../../prisma/client');
+// const { authMiddleware } = require('../middlewares/authMiddleware');
+const { hashPassword, comparePassword, currentuser} = require('../services/authService');
+const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../services/tokenService');
+const { sendPasswordResetMail, sendConfirmMail } = require('../services/emailService');
 
 
-
-router.get('/asd', (req, res) => {
-  res.json("User route is up");
-});
-
-router.get('/users', async (req, res) => {
-
-    const allUsers = await prisma.user.findMany()
-    res.json(allUsers)
-});
  
 
-router.post('/register', async(req, res, next) => {
+// TEST ROUTE
+async function authhome(req, res) {
+  res.json("auth route is up");
+
+};
+
+async function register(req, res, next)  {
     const { email, firstname, lastname, username, password, gender } = req.body;
 
     try {
@@ -43,11 +33,11 @@ router.post('/register', async(req, res, next) => {
     } catch (error) {
         next(error)
     }
-});
+};
 
 
 // Login route
-router.post('/login', async (req, res, next) => {
+async function login (req, res, next) {
     const { email, password } = req.body;
     try {
       const user = await prisma.user.findUnique({
@@ -72,11 +62,11 @@ router.post('/login', async (req, res, next) => {
         next(error)
     //   res.status(500).send('Error logging in');
     }
-  }); 
+  }; 
 
 
 // Logout route
-router.post('/logout', (req, res) => {
+async function logout (req, res) {
     req.session.destroy(err => {
         if (err) {
         return res.status(500).send({"error": "Failed to logout"});
@@ -84,13 +74,11 @@ router.post('/logout', (req, res) => {
         res.clearCookie('connect.sid');
         res.json('Logout successful');
     });
-});  
-
-
+};  
 
 
 // Route to get current logged-in user
-router.get('/current_user', authMiddleware, async (req, res) => {
+async function current_user (req, res) { 
     const userId = req.session.user.id;
     try {
       const user = await prisma.user.findUnique({
@@ -105,31 +93,14 @@ router.get('/current_user', authMiddleware, async (req, res) => {
     } catch (error) {
       res.status(500).send('Error fetching user data');
     }
-  });
+  };
 
 
-// GET user by id
-router.get('/user/:id', async (req, res, next) => {
-    try {
-        const {id} = req.params
-        const user = await prisma.user.findUnique({
-            where: { id: parseInt(id) },
-        });
-        if (user) {
-            res.json(user);
-        }
-        else {
-            res.json({ error: 'Post not found.'});
-        }
-    } catch (error) {
-        next(error) 
-        }
-});
 
 
 
 // Request password reset
-router.post('/request-reset', async (req, res, next) => {
+async function requestPasswordReset(req, res, next) {
   const { email } = req.body;
   // const user = users.find((u) => u.email === email);
   const user = await prisma.user.findUnique({
@@ -152,11 +123,11 @@ router.post('/request-reset', async (req, res, next) => {
     next(error)
     // res.status(500).json({ message: 'Error sending email', error });
   }
-});
+};
 
 
 // route to reset password??
-router.post('/reset-password/:token', async (req, res, next) => {
+async function resetPassword(req, res){
   const { token } = req.params;
   const { password } = req.body;  
 
@@ -186,11 +157,11 @@ router.post('/reset-password/:token', async (req, res, next) => {
     next(error)
     // res.status(400).json({ message: error.message });
   }
-});
+};
   
 
 // Resend Confirmation Mail
-router.post('/email-resend', authMiddleware, async (req, res, next) => {
+async function resendConfirmationMail(req, res, next) {
 
   const userId = req.session.user.id;
   const user = await prisma.user.findUnique({
@@ -208,12 +179,12 @@ router.post('/email-resend', authMiddleware, async (req, res, next) => {
   } catch (error) {
     next(error)
   }
-});
+};
 
 
 
 // route to confirm email/account
-router.post('/confirm-email/:token', async (req, res, next) => {
+async function confirmEmail(req, res, next) {
   const { token } = req.params;
 
   try {
@@ -238,7 +209,7 @@ router.post('/confirm-email/:token', async (req, res, next) => {
   } catch (error) {
     next(error)
     }
-});
+};
 
 
 
@@ -251,4 +222,13 @@ router.post('/confirm-email/:token', async (req, res, next) => {
 
 
 
-module.exports = router;
+module.exports = {
+  authhome,
+  register,
+  login,
+  logout,
+  current_user,
+  requestPasswordReset,
+  resetPassword,
+  resendConfirmationMail,
+  confirmEmail}

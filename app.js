@@ -25,10 +25,12 @@ app.use(session({
     cookie: { secure: false, maxAge: 60 * 60 * 1000} // Use secure: true if using HTTPS
   }));
 
-const userRouter = require('./routes/users');
-const todoRouter = require('./routes/todos');
+const authRouter = require('./src/routes/authRoute');
+const userRouter = require('./src/routes/userRoute');
+const todoRouter = require('./src/routes/todoRoute');
 
 // Use routers with specific paths
+app.use('/api', authRouter);
 app.use('/api', userRouter);
 app.use('/api', todoRouter);
 

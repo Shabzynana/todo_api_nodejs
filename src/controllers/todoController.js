@@ -1,22 +1,19 @@
 // routes/users.js
-const router = require('express').Router();
-
-const { authMiddleware, currentuser } = require('../utils/helpers');
-const { prisma } = require('../prisma/client');
+const { prisma } = require('../../prisma/client');
 
 
 
 
 // TEST ROUTE
-router.get("/taskhome", async (req, res) => {
+async function taskhome(req, res) {
     res.json("Todo route is up");
 
-});
+};
 
 
 
 // GET ALL TASK IN THE DATABASE
-router.get("/tasks", async (req, res, next) => {
+async function allTasks(req, res, next) {
     try {
         const task = await prisma.todo.findMany();
         res.json(task)    
@@ -24,11 +21,11 @@ router.get("/tasks", async (req, res, next) => {
         next(error)
     }
     
-});
+};
 
 
 // CREATE TASK
-router.post("/create", authMiddleware, async (req,res,next) => {
+async function createTask(req, res, next) {
 
     const { title, content, date, userId} = req.body;
     try{
@@ -46,11 +43,11 @@ router.post("/create", authMiddleware, async (req,res,next) => {
         next(error)
     }
     
-});
+};
 
 
 // GET A TASK BY ID
-router.get("/task/:id", authMiddleware,async (req, res, next) => {
+async function getTask(req, res, next) {
     try {
         const {id} = req.params
         const task = await prisma.todo.findUnique({
@@ -65,11 +62,11 @@ router.get("/task/:id", authMiddleware,async (req, res, next) => {
     } catch (error) {
         next(error) 
         }
-});
+};
 
 
 // GET ALL TASK BY A PARTICULAR USER
-router.get("/user_task/:id", async (req ,res, next) => {
+async function userTasksId(req, res, next) {
     try {
         const {id} = req.params
         const user_Id = await prisma.user.findUnique({
@@ -87,12 +84,12 @@ router.get("/user_task/:id", async (req ,res, next) => {
     } catch (error) {
         next(error)
         }
-});
+};       
 
 
 
-// GET ALL TASK BY A PARTICULAR USER
-router.get("/user_tasks/:user", async (req ,res, next) => {
+// GET ALL TASK BY A PARTICULAR USER USING USERNAME
+async function userTasksUsername(req, res, next) {
     try {
         const {user} = req.params
         const user_Id = await prisma.user.findUnique({
@@ -108,11 +105,11 @@ router.get("/user_tasks/:user", async (req ,res, next) => {
     } catch (error) {
         next(error)
         }
-});
+};
 
 
 // UPDATE A TASK USING ID
-router.put("/task/:id", authMiddleware, async(req, res, next) => {
+async function updateTask(req, res, next) {
 
     // const { name, email, password } = req.body;
     try {
@@ -139,11 +136,11 @@ router.put("/task/:id", authMiddleware, async(req, res, next) => {
         next(error)
     }    
 
-});
+};
 
 
 // DELETE TASK USING ID
-router.delete("/task/:id", authMiddleware, async(req, res, next) => {
+async function deleteTask(req, res, next) {
 
     // const { name, email, password } = req.body;
     try {
@@ -165,9 +162,17 @@ router.delete("/task/:id", authMiddleware, async(req, res, next) => {
     } catch (error) {
         next(error)
     }    
-});
+};
 
 
 
 
-module.exports = router;
+module.exports = {
+    taskhome, 
+    allTasks, 
+    createTask, 
+    getTask, 
+    userTasksId, 
+    userTasksUsername, 
+    updateTask, 
+    deleteTask};
